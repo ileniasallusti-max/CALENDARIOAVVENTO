@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Dashboard · Avvento GUA</title>
+<meta name="theme-color" content="#FBEFF3">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Dashboard GUA">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="icon" href="icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Unbounded:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+  .wrap { max-width: 720px; margin: 0 auto; padding: calc(env(safe-area-inset-top) + 18px) 14px calc(env(safe-area-inset-bottom) + 40px); }
+  .top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .top img { width: 58px; }
+  .links { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+  .pill { font: 600 12px var(--sans); padding: 9px 13px; border-radius: 999px; background: #fff; color: var(--ink); text-decoration: none; border: 0; cursor: pointer; }
+  h1 { font-size: 28px; line-height: 1.05; margin: 18px 0 6px; }
+  .lead { font-size: 13.5px; color: var(--ink-soft); line-height: 1.55; margin: 0 0 16px; }
+  .card { background: #fff; border-radius: 22px; padding: 16px; box-shadow: 0 8px 30px rgba(140,50,80,.06); }
+  .k { font-size: 11px; font-weight: 700; color: var(--pink); }
+  label.f { display: block; font-size: 12px; font-weight: 600; color: var(--ink-soft); margin: 14px 0 6px; }
+  input[type=password], input[type=text], input[type=url], textarea {
+    width: 100%; font: 16px var(--sans); color: var(--ink); padding: 12px 14px; border-radius: 14px; border: 1px solid #F0D9E1; background: #FFF9FB; outline: none; }
+  input:focus, textarea:focus { border-color: var(--pink); background: #fff; }
+  textarea { min-height: 76px; resize: vertical; line-height: 1.45; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 0; cursor: pointer; width: 100%; min-height: 50px; padding: 12px 20px; border-radius: 16px; font: 600 15px var(--sans); background: var(--ink); color: #fff; margin-top: 14px; }
+  .btn.small { width: auto; min-height: 40px; font-size: 13px; padding: 8px 16px; border-radius: 12px; margin-top: 10px; }
+  .btn.soft { background: #FBEAF0; color: var(--ink); }
+  .btn.danger { background: #fff; color: #A8344F; border: 1px solid #F0C9D4; font-weight: 500; }
+  .btn:disabled { opacity: .5; }
+  .err { color: #A8344F; font-size: 13px; margin-top: 8px; min-height: 16px; }
+  .ok { color: #2F7D55; font-size: 13px; font-weight: 600; }
+  .hidden { display: none !important; }
+
+  .login { max-width: 360px; margin: 14vh auto 0; text-align: center; }
+  .login img { width: 92px; }
+  .login h1 { margin-top: 10px; }
+
+  .notice { margin-bottom: 16px; }
+  .notice .row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+
+  .days { display: flex; flex-direction: column; gap: 8px; }
+  .day { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; background: #fff; border: 0; border-radius: 20px; padding: 8px 14px 8px 8px; cursor: pointer; font-family: var(--sans); color: var(--ink); box-shadow: 0 4px 16px rgba(140,50,80,.05); }
+  .day .o { width: 44px; flex: none; }
+  .day .o svg { width: 100%; height: auto; }
+  .day .t { flex: 1; min-width: 0; }
+  .day .d { font-size: 11.5px; font-weight: 600; color: var(--ink-soft); }
+  .day .n { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .badge { flex: none; font-size: 11px; font-weight: 700; padding: 5px 10px; border-radius: 999px; background: #F6E6EC; color: var(--ink-soft); }
+  .badge.ready { background: #E3F3EA; color: #2F7D55; }
+  .badge.live { background: var(--pink); color: #fff; }
+
+  .modal { position: fixed; inset: 0; z-index: 50; display: none; align-items: flex-end; justify-content: center; background: rgba(61,26,43,.25); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+  .modal.show { display: flex; }
+  @media (min-width: 640px) { .modal { align-items: center; } }
+  .sheet { width: 100%; max-width: 540px; max-height: 94vh; overflow: auto; scrollbar-width: none; background: #FFF9FB; border-radius: 30px 30px 0 0; padding: 20px 16px calc(env(safe-area-inset-bottom) + 24px); position: relative; animation: up .3s ease; }
+  .sheet::-webkit-scrollbar { display: none; }
+  @media (min-width: 640px) { .sheet { border-radius: 30px; } }
+  @keyframes up { from { transform: translateY(30px); opacity: 0; } }
+  .close { position: absolute; top: 14px; right: 14px; width: 36px; height: 36px; border-radius: 50%; border: 0; background: #F7E6EC; color: var(--ink); cursor: pointer; font-size: 18px; }
+  .sheet h2 { font-size: 24px; }
+  .sheet .when { font-size: 12.5px; color: var(--ink-soft); margin-top: 2px; }
+  .it-card { background: #fff; border-radius: 18px; padding: 12px; margin-top: 10px; border: 1px solid #F3E0E7; }
+  .it-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .seg { display: flex; gap: 3px; background: #FBEAF0; padding: 3px; border-radius: 12px; flex: 1; }
+  .seg button { flex: 1; border: 0; background: none; height: 34px; border-radius: 9px; font: 600 12px var(--sans); color: var(--ink-soft); cursor: pointer; }
+  .seg button.on { background: #fff; color: var(--pink); box-shadow: 0 2px 8px rgba(140,50,80,.1); }
+  .rm { border: 0; background: none; color: #A8344F; font: 600 12px var(--sans); cursor: pointer; padding: 8px; }
+  .it-card input { margin-top: 8px; }
+  .pick { display: block; margin-top: 8px; border: 1.5px dashed #E8BCCB; border-radius: 14px; padding: 13px; text-align: center; cursor: pointer; font-size: 13.5px; font-weight: 600; color: var(--pink); background: #FFF9FB; word-break: break-all; }
+  .pick small { display: block; font-weight: 400; color: var(--ink-soft); font-size: 11.5px; margin-top: 3px; }
+  .pick input { display: none; }
+  .add { width: 100%; margin-top: 10px; border: 1.5px dashed #E8BCCB; background: none; border-radius: 16px; min-height: 46px; font: 600 13.5px var(--sans); color: var(--pink); cursor: pointer; }
+  .progress { height: 4px; border-radius: 4px; background: #F2D6DF; overflow: hidden; margin-top: 14px; }
+  .progress i { display: block; height: 100%; width: 0; background: var(--pink); transition: width .2s; }
+</style>
+</head>
+<body>
+
+<div class="wrap" id="loginView">
+  <div class="card login">
+    <img src="logo-gua.png" alt="GUA">
+    <h1>Area <span class="it">riservata</span></h1>
+    <p class="lead">Solo per chi gestisce il calendario.</p>
+    <input type="password" id="pw" placeholder="Password" autocomplete="current-password" aria-label="Password">
+    <button class="btn" id="loginBtn">Entra</button>
+    <div class="err" id="loginErr"></div>
+  </div>
+</div>
+
+<div class="wrap hidden" id="dashView">
+  <div class="top">
+    <img src="logo-gua.png" alt="GUA">
+    <div class="links">
+      <a class="pill" href="/" target="_blank" rel="noopener">Sito ragazze</a>
+      <a class="pill" href="/?anteprima" target="_blank" rel="noopener">Anteprima</a>
+      <button class="pill" id="logout">Esci</button>
+    </div>
+  </div>
+  <h1>Il tuo <span class="it">calendario</span></h1>
+  <p class="lead">Ogni giorno ha già il suo contenuto in programma. Tocca il giorno, scegli il file o incolla il link e premi Salva: le ragazze lo vedono quel giorno alle 15:00.</p>
+
+  <div class="card notice">
+    <div class="row"><span class="k">Avviso in alto (piccolo spoiler)</span><span class="ok hidden" id="noticeOk">Salvato</span></div>
+    <textarea id="noticeTxt" aria-label="Avviso in alto" placeholder="Lascia vuoto per nasconderlo"></textarea>
+    <button class="btn small" id="noticeSave">Salva avviso</button>
+  </div>
+
+  <div class="days" id="days"></div>
+</div>
+
+<div class="modal" id="modal">
+  <div class="sheet" role="dialog" aria-modal="true">
+    <button class="close" id="closeBtn" aria-label="Chiudi">×</button>
+    <h2 id="edTitle"></h2>
+    <div class="when" id="edWhen"></div>
+    <label class="f" for="fTitle">Titolo che vedranno</label>
+    <input type="text" id="fTitle" maxlength="120">
+    <label class="f" for="fMsg">Messaggio (facoltativo)</label>
+    <textarea id="fMsg" maxlength="2000"></textarea>
+    <label class="f">Contenuti</label>
+    <div id="items"></div>
+    <button class="add" id="addItem">+ Aggiungi un altro contenuto</button>
+    <div class="progress hidden" id="progress"><i></i></div>
+    <div class="err" id="edErr"></div>
+    <button class="btn" id="saveBtn">Salva</button>
+    <button class="btn danger hidden" id="delBtn">Svuota questo giorno</button>
+  </div>
+</div>
+
+<script src="ornaments.js"></script>
+<script>
+{
+const CHUNK = 3 * 1024 * 1024, MAX = 150 * 1024 * 1024;
+const TYPES = { audio: "Audio", youtube: "YouTube", pdf: "PDF", link: "Link" };
+let key = null;
+try { key = localStorage.getItem("gua_admin_key"); } catch (e) {}
+let days = [], plan = {}, cur = null, items = [];
+const $ = id => document.getElementById(id);
+const esc = s => String(s || "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const WEEK = ["domenica", "lunedì", "martedì", "mercoledì", "giovedì", "venerdì", "sabato"];
+
+async function api(path, opts = {}) {
+  opts.headers = Object.assign({ "x-admin-key": key || "" }, opts.headers || {});
+  const res = await fetch(path, opts);
+  let data = {};
+  try { data = await res.json(); } catch (e) {}
+  if (!res.ok) throw new Error(data.error || "Errore " + res.status);
+  return data;
+}
+
+async function login() {
+  const pw = $("pw").value.trim();
+  if (!pw) return;
+  $("loginBtn").disabled = true; $("loginErr").textContent = "";
+  key = pw;
+  try {
+    await api("/api/admin/login", { method: "POST" });
+    try { localStorage.setItem("gua_admin_key", key); } catch (e) {}
+    await showDash();
+  } catch (e) { $("loginErr").textContent = e.message; key = null; }
+  $("loginBtn").disabled = false;
+}
+$("loginBtn").onclick = login;
+$("pw").addEventListener("keydown", e => { if (e.key === "Enter") login(); });
+$("logout").onclick = () => { try { localStorage.removeItem("gua_admin_key"); } catch (e) {} location.reload(); };
+
+async function showDash() {
+  await refresh(true);
+  $("loginView").classList.add("hidden");
+  $("dashView").classList.remove("hidden");
+}
+
+async function refresh(first) {
+  const data = await api("/api/days");
+  if (!data.admin) { try { localStorage.removeItem("gua_admin_key"); } catch (e) {} throw new Error("Password scaduta"); }
+  days = data.days; plan = data.plan || {};
+  if (first) $("noticeTxt").value = data.notice || "";
+  $("days").innerHTML = days.map(d => {
+    const c = d.content, p = plan[d.day] || {};
+    const date = new Date(d.unlockAt);
+    const badge = c ? (d.unlocked ? '<span class="badge live">Aperta</span>' : '<span class="badge ready">Pronta</span>') : '<span class="badge">Da caricare</span>';
+    return `<button class="day" data-d="${d.day}">
+      <span class="o">${GUAOrnament(d.day, { suffix: "a" })}</span>
+      <span class="t"><span class="d">${WEEK[date.getDay()]} ${d.day} dicembre</span><span class="n" style="display:block">${esc(c ? c.title || p.title : p.title)}</span></span>
+      ${badge}</button>`;
+  }).join("");
+}
+$("days").onclick = e => { const b = e.target.closest(".day"); if (b) openEditor(days[b.dataset.d - 1]); };
+
+$("noticeSave").onclick = async () => {
+  try {
+    await api("/api/admin/notice", { method: "POST", body: JSON.stringify({ notice: $("noticeTxt").value.trim() }), headers: { "content-type": "application/json" } });
+    $("noticeOk").textContent = "Salvato";
+  } catch (e) { $("noticeOk").textContent = e.message; }
+  $("noticeOk").classList.remove("hidden"); setTimeout(() => $("noticeOk").classList.add("hidden"), 2500);
+};
+
+function openEditor(d) {
+  cur = d;
+  const c = d.content, p = plan[d.day] || {};
+  $("edTitle").innerHTML = `${d.day} <span class="it">dicembre</span>`;
+  $("edWhen").textContent = d.unlocked ? "Già aperta: le modifiche si vedono subito." : "Si apre alle 15:00 di quel giorno.";
+  $("fTitle").value = c ? c.title || "" : p.title || "";
+  $("fMsg").value = c ? c.message || "" : p.message || "";
+  items = c ? c.items.map(i => Object.assign({}, i)) : (p.items || [["pdf", ""]]).map(([type, label]) => ({ type, label }));
+  $("edErr").textContent = ""; $("progress").classList.add("hidden");
+  $("delBtn").classList.toggle("hidden", !c); $("delBtn").textContent = "Svuota questo giorno"; delete $("delBtn").dataset.sure;
+  drawItems();
+  $("modal").classList.add("show");
+}
+function closeEditor() { $("modal").classList.remove("show"); }
+$("closeBtn").onclick = closeEditor;
+$("modal").addEventListener("click", e => { if (e.target.id === "modal") closeEditor(); });
+
+function drawItems() {
+  $("items").innerHTML = items.map((it, i) => {
+    let field = "";
+    if (it.type === "youtube") field = `<input type="url" data-i="${i}" data-k="youtube" value="${esc(it.youtube)}" placeholder="Link YouTube (https://youtu.be/…)" autocapitalize="off">`;
+    else if (it.type === "link") field = `<input type="url" data-i="${i}" data-k="url" value="${esc(it.url)}" placeholder="Link (Zoom, Spotify, Drive…)" autocapitalize="off">`;
+    else {
+      const name = it.pending ? it.pending.name + " · " + (it.pending.size / 1048576).toFixed(1) + " MB" : it.file ? "Caricato: " + it.file.name : "Scegli il file";
+      const hint = it.type === "pdf" ? "PDF da File, iCloud o Canva" : "MP3 o M4A. Dai Memo vocali: Condividi › Salva su File";
+      field = `<label class="pick">${esc(name)}<small>${it.file && !it.pending ? "Tocca per sostituirlo" : hint}</small><input type="file" data-i="${i}" accept="${it.type === "pdf" ? "application/pdf,.pdf" : "audio/*,.m4a,.mp3,.wav,.aac"}"></label>`;
+    }
+    return `<div class="it-card">
+      <div class="it-head"><div class="seg">${Object.keys(TYPES).map(t => `<button data-i="${i}" data-t="${t}" class="${t === it.type ? "on" : ""}">${TYPES[t]}</button>`).join("")}</div>
+      ${items.length > 1 ? `<button class="rm" data-rm="${i}">Togli</button>` : ""}</div>
+      <input type="text" data-i="${i}" data-k="label" value="${esc(it.label)}" placeholder="Nome del pulsante (es. Ascolta il podcast)">
+      ${field}</div>`;
+  }).join("");
+}
+$("items").addEventListener("click", e => {
+  const t = e.target.closest("[data-t]"), rm = e.target.closest("[data-rm]");
+  if (t) { const it = items[t.dataset.i]; if (it.type !== t.dataset.t) { items[t.dataset.i] = { type: t.dataset.t, label: it.label }; drawItems(); } }
+  if (rm) { items.splice(+rm.dataset.rm, 1); drawItems(); }
+});
+$("items").addEventListener("input", e => { const el = e.target; if (el.dataset.k) items[el.dataset.i][el.dataset.k] = el.value; });
+$("items").addEventListener("change", e => {
+  const el = e.target;
+  if (el.type !== "file") return;
+  const f = el.files[0];
+  if (!f) return;
+  if (f.size > MAX) { $("edErr").textContent = "File troppo grande (massimo 150 MB)."; return; }
+  items[el.dataset.i].pending = f; $("edErr").textContent = ""; drawItems();
+});
+$("addItem").onclick = () => { if (items.length < 8) { items.push({ type: "pdf", label: "" }); drawItems(); } };
+
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+
+$("saveBtn").onclick = async () => {
+  const btn = $("saveBtn");
+  $("edErr").textContent = "";
+  for (const it of items) {
+    if ((it.type === "audio" || it.type === "pdf") && !it.pending && !it.file) { $("edErr").textContent = `Manca il file per "${it.label || TYPES[it.type]}"`; return; }
+    if (it.type === "youtube" && !(it.youtube || "").trim()) { $("edErr").textContent = "Incolla il link YouTube"; return; }
+    if (it.type === "link" && !(it.url || "").trim()) { $("edErr").textContent = "Incolla il link"; return; }
+  }
+  btn.disabled = true;
+  try {
+    const pend = items.filter(i => i.pending);
+    const total = pend.reduce((a, i) => a + Math.ceil(i.pending.size / CHUNK), 0);
+    let done = 0;
+    if (total) $("progress").classList.remove("hidden");
+    for (const it of pend) {
+      const f = it.pending, parts = Math.ceil(f.size / CHUNK), upload = uid();
+      for (let p = 0; p < parts; p++) {
+        btn.textContent = `Carico… ${Math.round(done / total * 100)}%`;
+        let tries = 0;
+        while (true) {
+          try { await api(`/api/admin/chunk?day=${cur.day}&upload=${upload}&part=${p}`, { method: "POST", body: f.slice(p * CHUNK, (p + 1) * CHUNK), headers: { "content-type": "application/octet-stream" } }); break; }
+          catch (e) { if (++tries >= 3) throw e; await new Promise(r => setTimeout(r, 1200)); }
+        }
+        done++; $("progress").firstElementChild.style.width = Math.round(done / total * 100) + "%";
+      }
+      const mime = f.type || (it.type === "pdf" ? "application/pdf" : /\.m4a$/i.test(f.name) ? "audio/mp4" : "audio/mpeg");
+      it.file = { uploadId: upload, parts, name: f.name, mime, size: f.size };
+      delete it.pending;
+    }
+    btn.textContent = "Salvo…";
+    const body = { day: cur.day, title: $("fTitle").value.trim(), message: $("fMsg").value.trim(),
+      items: items.map(({ type, label, youtube, url, file }) => ({ type, label, youtube, url, file })) };
+    const res = await api("/api/admin/save", { method: "POST", body: JSON.stringify(body), headers: { "content-type": "application/json" } });
+    cur.content = res.content;
+    await refresh();
+    closeEditor();
+  } catch (e) { $("edErr").textContent = e.message; }
+  btn.disabled = false; btn.textContent = "Salva";
+};
+
+$("delBtn").onclick = async () => {
+  const b = $("delBtn");
+  if (!b.dataset.sure) { b.dataset.sure = "1"; b.textContent = "Tocca di nuovo per confermare"; return; }
+  try { await api(`/api/admin/delete?day=${cur.day}`, { method: "POST" }); await refresh(); closeEditor(); }
+  catch (e) { $("edErr").textContent = e.message; }
+};
+
+if (key) showDash().catch(() => {});
+}
+</script>
+</body>
+</html>
