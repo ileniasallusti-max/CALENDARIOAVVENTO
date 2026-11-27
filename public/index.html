@@ -129,6 +129,9 @@
   .yt { position: relative; width: 100%; padding-top: 56.25%; border-radius: 14px; overflow: hidden; background: #000; }
   .yt iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
   .btns { display: flex; gap: 8px; flex-wrap: wrap; }
+  .code { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 8px 8px 16px; border-radius: 16px; background: #fff; border: 2px dashed rgba(201,85,126,.5); }
+  .code span { font-family: "Unbounded", sans-serif; font-weight: 600; font-size: 20px; letter-spacing: .02em; color: #C2456F; user-select: all; -webkit-user-select: all; word-break: break-all; }
+  .code .copy { flex: none; border: 0; cursor: pointer; min-height: 42px; padding: 0 16px; border-radius: 12px; font: 600 14px var(--sans); background: #C9557E; color: #fff; }
   .btn { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 0; cursor: pointer; text-decoration: none; min-height: 46px; padding: 12px 18px; border-radius: 14px;
     font: 600 14px var(--sans); background: #fff; color: #C2456F; }
   .btn.ghost { background: rgba(255,255,255,.15); color: #fff; border: 1px solid rgba(255,255,255,.45); }
@@ -327,9 +330,10 @@ const ICONS = {
   audio: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18V6l10-2v12"/><circle cx="6" cy="18" r="3"/><circle cx="16" cy="16" r="3"/></svg>',
   youtube: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>',
   pdf: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/></svg>',
+  code: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M20 12l-8 8-9-9V3h8z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg>',
   link: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>',
 };
-const DEFAULT_LABEL = { audio: "Ascolta", youtube: "Guarda il video", pdf: "Il tuo PDF", link: "Apri il link" };
+const DEFAULT_LABEL = { audio: "Ascolta", youtube: "Guarda il video", pdf: "Il tuo PDF", link: "Apri il link", code: "Il tuo codice sconto" };
 
 function openModal(d) {
   const c = d.content;
@@ -360,6 +364,14 @@ function renderItem(day, it, body) {
   if (window.DEMO_RENDER && window.DEMO_RENDER(it, body)) return;
   if (it.type === "youtube") {
     body.innerHTML = `<div class="yt"><iframe src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(it.youtubeId)}?playsinline=1&rel=0" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen title="Video"></iframe></div>`;
+  } else if (it.type === "code") {
+    body.innerHTML = `<div class="code"><span>${esc(it.code)}</span><button type="button" class="copy">Copia</button></div>${it.url ? `<div class="btns" style="margin-top:8px"><a class="btn ghost" href="${esc(it.url)}" target="_blank" rel="noopener">Usalo qui</a></div>` : ""}`;
+    const b = body.querySelector(".copy");
+    b.onclick = async () => {
+      try { await navigator.clipboard.writeText(it.code); b.textContent = "Copiato"; }
+      catch (e) { const r = document.createRange(); r.selectNodeContents(body.querySelector(".code span")); getSelection().removeAllRanges(); getSelection().addRange(r); b.textContent = "Selezionato"; }
+      setTimeout(() => (b.textContent = "Copia"), 2000);
+    };
   } else if (it.type === "link") {
     body.innerHTML = `<div class="btns"><a class="btn" href="${esc(it.url)}" target="_blank" rel="noopener">Apri</a></div>`;
   } else {

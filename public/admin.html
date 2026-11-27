@@ -69,7 +69,7 @@
   .it-card { background: #fff; border-radius: 18px; padding: 12px; margin-top: 10px; border: 1px solid #F3E0E7; }
   .it-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
   .seg { display: flex; gap: 3px; background: #FBEAF0; padding: 3px; border-radius: 12px; flex: 1; }
-  .seg button { flex: 1; border: 0; background: none; height: 34px; border-radius: 9px; font: 600 12px var(--sans); color: var(--ink-soft); cursor: pointer; }
+  .seg button { flex: 1; border: 0; background: none; height: 34px; border-radius: 9px; font: 600 11px var(--sans); padding: 0 2px; color: var(--ink-soft); cursor: pointer; }
   .seg button.on { background: #fff; color: var(--pink); box-shadow: 0 2px 8px rgba(140,50,80,.1); }
   .rm { border: 0; background: none; color: #A8344F; font: 600 12px var(--sans); cursor: pointer; padding: 8px; }
   .it-card input { margin-top: 8px; }
@@ -138,7 +138,7 @@
 <script>
 {
 const CHUNK = 3 * 1024 * 1024, MAX = 150 * 1024 * 1024;
-const TYPES = { audio: "Audio", youtube: "YouTube", pdf: "PDF", link: "Link" };
+const TYPES = { audio: "Audio", youtube: "YouTube", pdf: "PDF", link: "Link", code: "Codice" };
 let key = null;
 try { key = localStorage.getItem("gua_admin_key"); } catch (e) {}
 let days = [], plan = {}, cur = null, items = [];
@@ -223,6 +223,7 @@ function drawItems() {
   $("items").innerHTML = items.map((it, i) => {
     let field = "";
     if (it.type === "youtube") field = `<input type="url" data-i="${i}" data-k="youtube" value="${esc(it.youtube)}" placeholder="Link YouTube (https://youtu.be/…)" autocapitalize="off">`;
+    else if (it.type === "code") field = `<input type="text" data-i="${i}" data-k="code" value="${esc(it.code)}" placeholder="Codice sconto (es. GUAXMAS20)" autocapitalize="characters" autocorrect="off"><input type="url" data-i="${i}" data-k="url" value="${esc(it.url)}" placeholder="Link dove usarlo (facoltativo)" autocapitalize="off">`;
     else if (it.type === "link") field = `<input type="url" data-i="${i}" data-k="url" value="${esc(it.url)}" placeholder="Link (Zoom, Spotify, Drive…)" autocapitalize="off">`;
     else {
       const name = it.pending ? it.pending.name + " · " + (it.pending.size / 1048576).toFixed(1) + " MB" : it.file ? "Caricato: " + it.file.name : "Scegli il file";
@@ -261,6 +262,7 @@ $("saveBtn").onclick = async () => {
     if ((it.type === "audio" || it.type === "pdf") && !it.pending && !it.file) { $("edErr").textContent = `Manca il file per "${it.label || TYPES[it.type]}"`; return; }
     if (it.type === "youtube" && !(it.youtube || "").trim()) { $("edErr").textContent = "Incolla il link YouTube"; return; }
     if (it.type === "link" && !(it.url || "").trim()) { $("edErr").textContent = "Incolla il link"; return; }
+    if (it.type === "code" && !(it.code || "").trim()) { $("edErr").textContent = "Scrivi il codice sconto"; return; }
   }
   btn.disabled = true;
   try {
@@ -285,7 +287,7 @@ $("saveBtn").onclick = async () => {
     }
     btn.textContent = "Salvo…";
     const body = { day: cur.day, title: $("fTitle").value.trim(), message: $("fMsg").value.trim(),
-      items: items.map(({ type, label, youtube, url, file }) => ({ type, label, youtube, url, file })) };
+      items: items.map(({ type, label, youtube, url, file, code }) => ({ type, label, youtube, url, file, code })) };
     const res = await api("/api/admin/save", { method: "POST", body: JSON.stringify(body), headers: { "content-type": "application/json" } });
     cur.content = res.content;
     await refresh();
