@@ -13,7 +13,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Unbounded:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=3">
 <style>
   /* Notte di Natale GUA: fondo prugna profondo, palline rosa che brillano, lucine sulle ghirlande */
   body { background: #D46A8E; color: #fff; }
@@ -143,7 +143,13 @@
   .toast { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom) + 22px); transform: translate(-50%, 30px); opacity: 0; z-index: 60; color: #fff; padding: 12px 18px; border-radius: 16px; font-size: 13px; font-weight: 500;
     transition: .3s; pointer-events: none; text-align: center; max-width: 88vw; background: rgba(190,70,115,.92); border: 1px solid rgba(255,255,255,.35); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
   .toast.show { opacity: 1; transform: translate(-50%, 0); }
-  .burst { position: fixed; pointer-events: none; z-index: 55; }
+  .burst { position: fixed; pointer-events: none; z-index: 56; }
+  .fx { position: fixed; inset: 0; z-index: 55; pointer-events: none; }
+  .fx-bg { position: absolute; inset: 0; opacity: 0; background: radial-gradient(circle at 50% 50%, rgba(255,235,243,.55), rgba(120,30,65,.45) 70%); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+  .fx-orn { position: absolute; transform-origin: 50% 50%; }
+  .fx-orn svg { width: 100%; height: auto; display: block; overflow: visible; }
+  .fx-flash { position: absolute; left: 50%; top: 50%; width: 120vmin; height: 120vmin; margin: -60vmin 0 0 -60vmin; border-radius: 50%; opacity: 0;
+    background: radial-gradient(circle, #fff 0%, rgba(255,240,246,.95) 18%, rgba(255,200,222,.5) 40%, rgba(255,200,222,0) 66%); }
 </style>
 </head>
 <body>
@@ -172,7 +178,7 @@
 </div>
 <div class="toast" id="toast" role="status"></div>
 
-<script src="ornaments.js"></script>
+<script src="ornaments.js?v=3"></script>
 <script>
 const params = new URLSearchParams(location.search);
 let adminKey = null;
@@ -254,7 +260,7 @@ function render() {
       const slot = document.createElement("div");
       slot.className = `slot ${open ? "open" : "locked"} ${today ? "today" : ""}`;
       slot.innerHTML = slotHTML(d, finale ? 0 : curveY(tt, sag), finale ? 22 : [3, 8, 5, 10, 6][(d.day * 3) % 5]);
-      slot.querySelector(".orn").addEventListener("click", ev => onTap(d, ev));
+      slot.querySelector(".orn").addEventListener("click", ev => onTap(d, ev, slot.querySelector(".orn")));
       row.appendChild(slot);
     });
     board.appendChild(row);
@@ -290,26 +296,64 @@ function fmtLeft(ms) {
   return pad(Math.floor(s / 3600)) + ":" + pad(Math.floor(s % 3600 / 60)) + ":" + pad(s % 60);
 }
 
-function onTap(d, ev) {
+let opening = false;
+function onTap(d, ev, btn) {
   if (!isOpen(d)) {
     const left = d.unlockAt - now();
+    // la pallina chiusa trema un attimo
+    btn.animate([{ transform: "rotate(0)" }, { transform: "rotate(-9deg)" }, { transform: "rotate(8deg)" }, { transform: "rotate(-5deg)" }, { transform: "rotate(3deg)" }, { transform: "rotate(0)" }], { duration: 550, easing: "ease-out" });
     toast(left < 86400000 ? `Si apre oggi alle 15:00, mancano ${fmtLeft(left)}` : `Si apre ${il(d.day)} dicembre alle 15:00`);
     return;
   }
-  burst(ev.clientX, ev.clientY);
-  openModal(d);
+  if (opening) return;
+  opening = true;
+  openFx(d, btn).then(() => { opening = false; openModal(d); });
 }
 
-function burst(x, y) {
+// effetto apertura: la pallina vola al centro, trema, si illumina ed esplode in brillantini
+function openFx(d, btn) {
+  return new Promise(done => {
+    const r = btn.getBoundingClientRect();
+    const fx = document.createElement("div");
+    fx.className = "fx";
+    fx.innerHTML = `<div class="fx-bg"></div><div class="fx-orn" style="left:${r.left}px;top:${r.top}px;width:${r.width}px">${GUAOrnament(d.day, { suffix: "fx" })}</div><div class="fx-flash"></div>`;
+    document.body.appendChild(fx);
+    const orn = fx.querySelector(".fx-orn"), bg = fx.querySelector(".fx-bg"), flash = fx.querySelector(".fx-flash");
+    const cx = innerWidth / 2, cy = innerHeight / 2;
+    const dx = cx - (r.left + r.width / 2), dy = cy - (r.top + r.height / 2);
+    const big = Math.min(2.6, (Math.min(innerWidth, innerHeight) * .5) / r.width);
+    btn.style.visibility = "hidden";
+    bg.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 400, fill: "forwards" });
+    const fly = orn.animate([
+      { transform: "translate(0,0) scale(1) rotate(0)" },
+      { transform: `translate(${dx}px,${dy}px) scale(${big}) rotate(0)`, offset: .45 },
+      { transform: `translate(${dx}px,${dy}px) scale(${big}) rotate(-8deg)`, offset: .55 },
+      { transform: `translate(${dx}px,${dy}px) scale(${big}) rotate(7deg)`, offset: .65 },
+      { transform: `translate(${dx}px,${dy}px) scale(${big}) rotate(-5deg)`, offset: .75 },
+      { transform: `translate(${dx}px,${dy}px) scale(${big * 1.08}) rotate(0)`, offset: .88 },
+      { transform: `translate(${dx}px,${dy}px) scale(${big * 1.2}) rotate(0)` },
+    ], { duration: 1100, easing: "cubic-bezier(.3,.7,.3,1)", fill: "forwards" });
+    orn.animate([{ filter: "drop-shadow(0 0 0 rgba(255,255,255,0))" }, { filter: "drop-shadow(0 0 30px rgba(255,255,255,1))" }], { duration: 1100, fill: "forwards" });
+    fly.onfinish = () => {
+      orn.animate([{ opacity: 1, transform: getComputedStyle(orn).transform }, { opacity: 0, transform: getComputedStyle(orn).transform + " scale(1.6)" }], { duration: 350, fill: "forwards" });
+      flash.animate([{ opacity: 0, transform: "scale(.2)" }, { opacity: 1, transform: "scale(1)", offset: .35 }, { opacity: 0, transform: "scale(1.4)" }], { duration: 700, easing: "ease-out", fill: "forwards" });
+      burst(cx, cy, 60, 260);
+      setTimeout(() => { done(); bg.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300, fill: "forwards" }); }, 380);
+      setTimeout(() => { fx.remove(); btn.style.visibility = ""; }, 800);
+    };
+  });
+}
+
+function burst(x, y, n = 22, far = 100) {
   const cols = ["#fff", "#FFD1E1", "#F3B9CA", "#C96A85", "#FFF1C9"];
-  for (let i = 0; i < 22; i++) {
+  for (let i = 0; i < n; i++) {
     const p = document.createElement("div");
     p.className = "burst";
-    const s = 4 + Math.random() * 7;
+    const s = 4 + Math.random() * (n > 30 ? 11 : 7);
     p.innerHTML = `<svg width="${s * 2}" height="${s * 2}" viewBox="-10 -10 20 20"><path d="M0-10Q2-2 10 0Q2 2 0 10Q-2 2-10 0Q-2-2 0-10Z" fill="${cols[i % cols.length]}"/></svg>`;
     p.style.left = x + "px"; p.style.top = y + "px";
     document.body.appendChild(p);
-    const a = Math.random() * Math.PI * 2, dist = 40 + Math.random() * 100;
+    const a = Math.random() * Math.PI * 2, dist = 40 + Math.random() * far;
     p.animate([
       { transform: "translate(-50%,-50%) scale(1)", opacity: 1 },
       { transform: `translate(${Math.cos(a) * dist}px, ${Math.sin(a) * dist}px) scale(.3) rotate(180deg)`, opacity: 0 }

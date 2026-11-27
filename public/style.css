@@ -37,6 +37,4 @@ h1, h2, h3 { font-family: var(--serif); font-weight: 600; margin: 0; letter-spac
 @keyframes spark { 0%, 100% { opacity: 0; transform: scale(.1) rotate(0); } 50% { opacity: 1; transform: scale(1) rotate(90deg); } }
 .orn-svg { overflow: visible; }
 
-@media (prefers-reduced-motion: reduce) {
-  .gl, .spk, .sheen, .orn { animation: none !important; }
-}
+/* le animazioni restano attive anche con "Riduci movimento": sono lente e leggere */
