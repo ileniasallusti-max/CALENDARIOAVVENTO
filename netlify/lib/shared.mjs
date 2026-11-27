@@ -51,8 +51,7 @@ export async function getDay(day) {
   return (await store().get(`days/${day}`, { type: "json" })) || null;
 }
 
-export const DEFAULT_NOTICE =
-  "Sofia Garilli, armocromista e stylist GUA: il 10 dicembre live su Zoom per scoprire come vestirti con stile d'inverno, abbinare i capi giusti e creare il look perfetto per le feste di Natale.";
+export const DEFAULT_NOTICE = "";
 
 export async function getSettings() {
   const s = (await store().get("settings", { type: "json" })) || {};
