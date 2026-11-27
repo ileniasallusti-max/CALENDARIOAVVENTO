@@ -6,7 +6,7 @@ import { isAdmin, json, store, validDay, getDay, getSettings, fileIds, cleanFile
 //  POST /api/admin/save                         → salva il giorno {day, title, message, items[]}
 //  POST /api/admin/delete?day=                  → svuota il giorno
 //  POST /api/admin/notice                       → salva l'avviso in alto {notice}
-const TYPES = ["audio", "youtube", "pdf", "link"];
+const TYPES = ["audio", "youtube", "pdf", "link", "code"];
 
 export default async (req) => {
   if (req.method !== "POST") return json({ error: "Metodo non consentito" }, 405);
@@ -56,6 +56,15 @@ export default async (req) => {
         if (!id) return json({ error: "Link YouTube non valido" }, 400);
         out.youtube = String(it.youtube).trim();
         out.youtubeId = id;
+      } else if (it.type === "code") {
+        const c = String(it.code || "").trim();
+        if (!c) return json({ error: "Scrivi il codice sconto" }, 400);
+        out.code = c.slice(0, 60);
+        const u = String(it.url || "").trim();
+        if (u) {
+          if (!/^https?:\/\/\S+$/i.test(u)) return json({ error: "Link del negozio non valido (deve iniziare con https://)" }, 400);
+          out.url = u.slice(0, 500);
+        }
       } else if (it.type === "link") {
         const u = String(it.url || "").trim();
         if (!/^https?:\/\/\S+$/i.test(u)) return json({ error: "Link non valido (deve iniziare con https://)" }, 400);
