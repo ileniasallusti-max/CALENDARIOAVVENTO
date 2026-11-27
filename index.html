@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Calendario dell'Avvento GUA</title>
+<meta name="theme-color" content="#EB97B3">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Avvento GUA">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="icon" href="icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Unbounded:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+  /* Notte di Natale GUA: fondo prugna profondo, palline rosa che brillano, lucine sulle ghirlande */
+  body { background: #D46A8E; color: #fff; }
+  body::before {
+    background:
+      radial-gradient(90% 40% at 50% 0%, rgba(255,214,228,.75), rgba(255,214,228,0) 70%),
+      radial-gradient(60% 35% at 0% 55%, rgba(255,190,210,.35), rgba(255,190,210,0) 70%),
+      radial-gradient(60% 35% at 100% 85%, rgba(255,170,200,.35), rgba(255,170,200,0) 70%),
+      linear-gradient(180deg, #EB97B3 0%, #DB7898 45%, #CF6489 100%);
+  }
+  .wrap { max-width: 640px; margin: 0 auto; padding: calc(env(safe-area-inset-top) + 14px) 14px calc(env(safe-area-inset-bottom) + 14px); }
+
+  header { text-align: center; }
+  .top { display: flex; justify-content: center; }
+  .logo { height: 40px; width: auto; display: block; filter: drop-shadow(0 2px 8px rgba(150,30,70,.25)); }
+  .tagpill { font-size: 11px; font-weight: 500; letter-spacing: .02em; padding: 7px 12px; border-radius: 999px; color: #FBEAF0;
+    background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14); }
+
+  h1 { font-family: "Unbounded", sans-serif; font-weight: 700; font-size: clamp(30px, 9vw, 58px); line-height: 1.02; letter-spacing: -.05em; margin-top: 16px; color: #fff; text-shadow: 0 4px 24px rgba(150,30,70,.25); text-wrap: balance; }
+  h1 .g { background: linear-gradient(100deg, #fff 0%, #FFD3E2 35%, #fff 60%, #FFC2D6 100%); -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: none;
+    background-size: 220% 100%; animation: shine 6s ease-in-out infinite; }
+  @keyframes shine { 0%,100% { background-position: 0% 0; } 50% { background-position: 100% 0; } }
+
+  .count { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top: 22px; }
+  .count .lbl { font-size: 14px; color: rgba(255,255,255,.9); font-weight: 500; }
+  .count .lbl b { font-weight: 700; color: #fff; }
+  .digits { display: flex; gap: 8px; justify-content: center; }
+  .digit { text-align: center; width: 76px; padding: 14px 4px 10px; border-radius: 22px; background: rgba(255,255,255,.22); border: 1px solid rgba(255,255,255,.45);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); box-shadow: 0 10px 30px rgba(150,30,70,.18); }
+  .digit b { display: block; font-family: "Unbounded", sans-serif; font-weight: 600; font-size: 32px; letter-spacing: -.05em; line-height: 1; color: #fff; font-variant-numeric: tabular-nums; }
+  .digit span { display: block; font-size: 11px; font-weight: 500; color: rgba(255,255,255,.85); margin-top: 6px; }
+
+  .spoiler { display: inline-flex; align-items: center; gap: 10px; margin-top: 16px; padding: 9px 16px; border-radius: 20px; max-width: 460px; max-width: 100%; text-align: left;
+    background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.35); }
+  .spoiler[hidden] { display: none; }
+  .spoiler .dot { flex: none; width: 7px; height: 7px; border-radius: 50%; background: #fff; box-shadow: 0 0 10px #fff; animation: blink 1.6s ease-in-out infinite; }
+  @keyframes blink { 50% { opacity: .35; } }
+  .spoiler p { margin: 0; font-size: 11.5px; line-height: 1.35; color: #fff; }
+  .spoiler b { font-weight: 700; }
+  .preview-banner { display: none; margin: 10px auto 0; font-size: 12px; color: #6E1C3B; background: #FFB3CB; padding: 7px 12px; border-radius: 999px; width: max-content; }
+  body.preview .preview-banner { display: block; }
+
+  /* 5 file di palline appese a fili di lucine */
+
+  .board { --cols: 3; margin-top: 26px; }
+  .row { position: relative; display: flex; justify-content: center; margin-top: 10px; }
+  .row .slot { flex: 0 0 calc(100% / var(--cols)); }
+  .row.finale { margin-top: 10px; }
+  .row.finale .slot { flex-basis: 50%; }
+  .row.finale .orn { max-width: 140px; }
+  .row.finale .chip { height: 24px; padding: 0 12px; font-size: 12px; }
+  .lights { position: absolute; inset: 0 -6px auto; height: 18px; pointer-events: none; }
+  .lights svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .bulb { position: absolute; width: 5px; height: 5px; margin: -2.5px 0 0 -2.5px; border-radius: 50%; background: #FFF6DC; box-shadow: 0 0 8px 2px rgba(255,240,200,.9); animation: bulb 2.6s ease-in-out infinite; }
+  .bulb.p { background: #fff; box-shadow: 0 0 8px 2px rgba(255,255,255,.9); }
+  @keyframes bulb { 0%,100% { opacity: 1; } 50% { opacity: .3; } }
+  .slot { position: relative; display: flex; flex-direction: column; align-items: center; }
+  .thread { width: 1px; background: rgba(255,255,255,.7); }
+  .orn { position: relative; width: 100%; max-width: 96px; margin-top: -2px; border: 0; padding: 0; background: none; cursor: pointer; transform-origin: 50% 0; animation: swing 6s ease-in-out infinite; }
+  .orn:focus-visible { outline: 2px solid #FFB3CB; outline-offset: 3px; border-radius: 14px; }
+  .orn:active { transform: scale(.93); }
+  @keyframes swing { 0%,100% { transform: rotate(-2deg); } 50% { transform: rotate(2deg); } }
+  .orn-svg { width: 100%; height: auto; display: block; transition: filter .4s; }
+  .slot.open .orn-svg { filter: drop-shadow(0 0 14px rgba(255,255,255,.75)) drop-shadow(0 8px 12px rgba(140,30,70,.3)); }
+  .slot.locked .orn-svg { filter: drop-shadow(0 8px 12px rgba(140,30,70,.3)) saturate(.9); }
+  .slot.today .orn::before { content: ""; position: absolute; inset: 18% 0 -4%; border-radius: 50%; background: radial-gradient(circle, rgba(255,150,195,.75), rgba(255,150,195,0) 66%); animation: halo 2s ease-in-out infinite; }
+  @keyframes halo { 0%,100% { opacity: .35; transform: scale(.9); } 50% { opacity: 1; transform: scale(1.2); } }
+
+  .chip { display: inline-flex; align-items: center; gap: 5px; margin-top: 4px; height: 26px; padding: 0 12px; border-radius: 999px; font-size: 13px; font-weight: 600; color: #FBEAF0; font-variant-numeric: tabular-nums;
+    background: rgba(255,255,255,.2); border: 1px solid rgba(255,255,255,.45); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+  .chip svg { width: 10px; height: 10px; opacity: .9; }
+  .chip .h { font-weight: 500; opacity: .85; }
+  .slot.open .chip { background: #fff; color: #C2456F; border-color: transparent; }
+
+  footer { display: none; }
+  @media (min-width: 700px) {
+    .wrap { padding-top: 30px; }
+    .logo { height: 38px; }
+    .board { --cols: 4; }
+    .orn { max-width: 110px; }
+    .row.finale .orn { max-width: 150px; }
+    .digit { width: 92px; }
+    .digit b { font-size: 40px; }
+    .lights { height: 28px; }
+    footer { display: block; text-align: center; margin-top: 16px; font-size: 12px; color: rgba(251,234,240,.5); }
+  }
+
+  /* scheda della sorpresa */
+  .modal { position: fixed; inset: 0; z-index: 50; display: none; align-items: flex-end; justify-content: center; background: rgba(120,30,65,.35); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+  .modal.show { display: flex; animation: fade .25s; }
+  @media (min-width: 640px) { .modal { align-items: center; } }
+  @keyframes fade { from { opacity: 0; } }
+  .sheet { width: 100%; max-width: 500px; max-height: 92vh; overflow: auto; scrollbar-width: none; color: #FBEAF0;
+    background: linear-gradient(180deg, #E58AA9 0%, #D46A8E 45%, #C9557E 100%); border: 1px solid rgba(255,255,255,.1); border-bottom: 0;
+    border-radius: 30px 30px 0 0; padding: 16px 18px calc(env(safe-area-inset-bottom) + 24px); position: relative; animation: up .45s cubic-bezier(.2,.9,.25,1.1); }
+  .sheet::-webkit-scrollbar { display: none; }
+  @media (min-width: 640px) { .sheet { border-radius: 30px; border-bottom: 1px solid rgba(255,255,255,.1); } }
+  @keyframes up { from { transform: translateY(50px); opacity: 0; } }
+  .grab { width: 38px; height: 4px; border-radius: 4px; background: rgba(255,255,255,.2); margin: 0 auto 12px; }
+  .close { position: absolute; top: 14px; right: 14px; width: 36px; height: 36px; border-radius: 50%; border: 1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.08); color: #fff; cursor: pointer; display: grid; place-items: center; }
+  .s-head { display: flex; align-items: center; gap: 14px; padding-right: 40px; }
+  .s-head .mini { width: 64px; flex: none; filter: drop-shadow(0 0 14px rgba(255,140,185,.6)); }
+  .s-head .date { font-size: 12px; font-weight: 600; color: #fff; opacity: .85; }
+  .s-head h2 { font-family: "Unbounded", sans-serif; font-weight: 600; font-size: 20px; line-height: 1.12; letter-spacing: -.03em; margin-top: 4px; color: #fff; }
+  .s-head h2 .it { color: #FFB3CB; }
+  .msg { font-size: 15px; line-height: 1.6; color: rgba(255,255,255,.92); white-space: pre-line; margin: 14px 0 0; }
+  .items { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+  .item { border-radius: 20px; background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.3); padding: 12px; }
+  .item .lab { font-size: 13.5px; font-weight: 600; margin-bottom: 10px; display: flex; align-items: center; gap: 9px; color: #fff; }
+  .item .lab i { width: 28px; height: 28px; border-radius: 10px; background: #fff; color: #C9557E !important; display: grid; place-items: center; font-style: normal; color: #fff; }
+  .item .lab i svg { width: 14px; height: 14px; }
+  .item audio { width: 100%; }
+  .yt { position: relative; width: 100%; padding-top: 56.25%; border-radius: 14px; overflow: hidden; background: #000; }
+  .yt iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+  .btns { display: flex; gap: 8px; flex-wrap: wrap; }
+  .code { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 8px 8px 16px; border-radius: 16px; background: #fff; border: 2px dashed rgba(201,85,126,.5); }
+  .code span { font-family: "Unbounded", sans-serif; font-weight: 600; font-size: 20px; letter-spacing: .02em; color: #C2456F; user-select: all; -webkit-user-select: all; word-break: break-all; }
+  .code .copy { flex: none; border: 0; cursor: pointer; min-height: 42px; padding: 0 16px; border-radius: 12px; font: 600 14px var(--sans); background: #C9557E; color: #fff; }
+  .btn { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 0; cursor: pointer; text-decoration: none; min-height: 46px; padding: 12px 18px; border-radius: 14px;
+    font: 600 14px var(--sans); background: #fff; color: #C2456F; }
+  .btn.ghost { background: rgba(255,255,255,.15); color: #fff; border: 1px solid rgba(255,255,255,.45); }
+  .loading { font-size: 13px; color: rgba(251,234,240,.7); }
+  .loading .bar { height: 3px; border-radius: 3px; background: rgba(255,255,255,.12); overflow: hidden; margin-top: 8px; }
+  .loading .bar i { display: block; height: 100%; width: 0; background: #FFB3CB; transition: width .2s; }
+  .empty { font-size: 14px; color: rgba(251,234,240,.7); margin-top: 16px; }
+
+  .toast { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom) + 22px); transform: translate(-50%, 30px); opacity: 0; z-index: 60; color: #fff; padding: 12px 18px; border-radius: 16px; font-size: 13px; font-weight: 500;
+    transition: .3s; pointer-events: none; text-align: center; max-width: 88vw; background: rgba(190,70,115,.92); border: 1px solid rgba(255,255,255,.35); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+  .burst { position: fixed; pointer-events: none; z-index: 56; }
+  .fx { position: fixed; inset: 0; z-index: 55; pointer-events: none; }
+  .fx-bg { position: absolute; inset: 0; opacity: 0; background: radial-gradient(circle at 50% 50%, rgba(255,235,243,.55), rgba(120,30,65,.45) 70%); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+  .fx-orn { position: absolute; transform-origin: 50% 50%; }
+  .fx-orn svg { width: 100%; height: auto; display: block; overflow: visible; }
+  .fx-flash { position: absolute; left: 50%; top: 50%; width: 120vmin; height: 120vmin; margin: -60vmin 0 0 -60vmin; border-radius: 50%; opacity: 0;
+    background: radial-gradient(circle, #fff 0%, rgba(255,240,246,.95) 18%, rgba(255,200,222,.5) 40%, rgba(255,200,222,0) 66%); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="top"><img class="logo" src="logo-gua-bianco.png" alt="GUA Glow Up Academy"></div>
+    <h1>Il calendario dell'Avvento <span class="g">GUA</span></h1>
+    <div class="count" aria-live="polite">
+      <div class="lbl" id="countLabel">Caricamento…</div>
+      <div class="digits" id="digits"></div>
+    </div>
+    <div class="spoiler" id="spoiler" hidden>
+      <span class="dot"></span>
+      <p><b>Spoiler</b> · <span id="spoilerText"></span></p>
+    </div>
+    <div class="preview-banner">Anteprima: tutte le palline aperte</div>
+  </header>
+
+  <main class="board" id="board" aria-label="Le 25 palline"></main>
+
+  <footer>Ogni giorno alle 15:00 si apre una pallina · con amore, GUA</footer>
+</div>
+
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-label="Sorpresa del giorno">
+  <div class="sheet" id="sheet"></div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script src="ornaments.js"></script>
+<script>
+const params = new URLSearchParams(location.search);
+let adminKey = null;
+try { adminKey = localStorage.getItem("gua_admin_key"); } catch (e) {}
+const PREVIEW = params.has("anteprima") && !!adminKey;
+if (PREVIEW) document.body.classList.add("preview");
+
+let state = { days: [], offset: 0 };
+const now = () => Date.now() + state.offset;
+const LOCK = '<svg viewBox="0 0 10 10" aria-hidden="true"><rect x="1.6" y="4.4" width="6.8" height="4.8" rx="1.2" fill="currentColor"/><path d="M3.1 4.5V3.3a1.9 1.9 0 0 1 3.8 0v1.2" fill="none" stroke="currentColor" stroke-width="1.1"/></svg>';
+const esc = s => String(s || "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const pad = n => String(n).padStart(2, "0");
+function il(d) { return d === 1 ? "il 1°" : (d === 8 || d === 11) ? "l'" + d : "il " + d; }
+
+async function load() {
+  try {
+    const res = await fetch("/api/days", { headers: PREVIEW ? { "x-admin-key": adminKey } : {}, cache: "no-store" });
+    const data = await res.json();
+    state.offset = data.now - Date.now();
+    state.days = data.days;
+    const sp = document.getElementById("spoiler");
+    if (data.notice) { document.getElementById("spoilerText").textContent = data.notice.replace(/^piccolo spoiler:?\s*/i, ""); sp.hidden = false; }
+    else sp.hidden = true;
+    render();
+  } catch (e) {
+    document.getElementById("countLabel").textContent = "Connessione assente, riprova tra poco";
+  }
+}
+
+const isOpen = d => PREVIEW || now() >= d.unlockAt;
+
+// fili di lucine: una curva per fila, con lampadine che brillano
+const SAG = [10, 12, 10, 12, 10, 12];
+const curveY = (t, sag) => 3 + 4 * sag * t * (1 - t);
+function lights(r) {
+  const sag = SAG[r % SAG.length];
+  let bulbs = "";
+  for (let i = 0; i < 9; i++) {
+    const t = (i + 0.5) / 9;
+    bulbs += `<span class="bulb ${i % 3 === 1 ? "p" : ""}" style="left:${(t * 100).toFixed(2)}%;top:${curveY(t, sag).toFixed(1)}px;animation-delay:${-((i * 0.53 + r) % 2.6).toFixed(2)}s"></span>`;
+  }
+  return `<div class="lights" aria-hidden="true"><svg viewBox="0 0 100 18" preserveAspectRatio="none"><path d="M0 3 Q50 ${3 + 2 * sag} 100 3" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="1" vector-effect="non-scaling-stroke"/></svg>${bulbs}</div>`;
+}
+
+const COLS = () => (innerWidth >= 700 ? 4 : 3);
+let lastCols = COLS();
+addEventListener("resize", () => { if (COLS() !== lastCols) { lastCols = COLS(); render(); } });
+
+function slotHTML(d, startY, extra) {
+  const open = isOpen(d);
+  return `
+    <div class="thread" style="margin-top:${startY.toFixed(1)}px;height:${extra}px"></div>
+    <button class="orn" style="animation-delay:${-((d.day * 0.83) % 6).toFixed(2)}s" aria-label="${d.day} dicembre${open ? "" : ", ancora chiusa"}">${GUAOrnament(d.day)}</button>
+    <span class="chip">${open ? (d.day === 25 ? "25 · Natale" : d.day) : LOCK + (d.day === 25 ? "25 dic" : d.day) + '<span class="h">· ore 15</span>'}</span>`;
+}
+
+function render() {
+  const board = document.getElementById("board");
+  const t = now(), dt = new Date(t + 3600000);
+  const cols = COLS();
+  board.innerHTML = "";
+  const list = state.days.filter(d => d.day < 25);
+  const rows = [];
+  for (let i = 0; i < list.length; i += cols) rows.push(list.slice(i, i + cols));
+  const fin = state.days.find(d => d.day === 25);
+  if (fin) rows.push([fin]);
+  rows.forEach((items, r) => {
+    const row = document.createElement("div");
+    const finale = items.length === 1 && items[0].day === 25;
+    row.className = "row" + (finale ? " finale" : "");
+    const sag = SAG[r % SAG.length];
+    if (!finale) row.innerHTML = lights(r);
+    // le palline sono centrate nella fila: calcolo dove cade ciascuna sulla curva
+    const n = items.length;
+    items.forEach((d, c) => {
+      const open = isOpen(d);
+      const today = open && !PREVIEW && dt.getUTCMonth() === 11 && dt.getUTCDate() === d.day;
+      const tt = ((cols - n) / 2 + c + 0.5) / cols;
+      const slot = document.createElement("div");
+      slot.className = `slot ${open ? "open" : "locked"} ${today ? "today" : ""}`;
+      slot.innerHTML = slotHTML(d, finale ? 0 : curveY(tt, sag), finale ? 22 : [3, 8, 5, 10, 6][(d.day * 3) % 5]);
+      slot.querySelector(".orn").addEventListener("click", ev => onTap(d, ev, slot.querySelector(".orn")));
+      row.appendChild(slot);
+    });
+    board.appendChild(row);
+  });
+  updateCount();
+}
+
+let lastOpen = -1;
+function updateCount() {
+  if (!state.days.length) return;
+  const t = now();
+  const next = state.days.find(d => t < d.unlockAt);
+  const openCount = state.days.filter(d => t >= d.unlockAt).length;
+  if (lastOpen !== -1 && openCount !== lastOpen) load();
+  lastOpen = openCount;
+  const lab = document.getElementById("countLabel"), dg = document.getElementById("digits");
+  if (PREVIEW) { lab.innerHTML = "<b>Anteprima</b>: tutte aperte"; dg.innerHTML = ""; return; }
+  if (!next) { lab.innerHTML = "<b>Buon Natale</b> da tutta GUA"; dg.innerHTML = ""; return; }
+  const s = Math.max(0, Math.floor((next.unlockAt - t) / 1000));
+  const v = [[Math.floor(s / 86400), "giorni"], [Math.floor(s % 86400 / 3600), "ore"], [Math.floor(s % 3600 / 60), "min"], [s % 60, "sec"]];
+  lab.innerHTML = `La pallina <b>${next.day}</b> si apre tra`;
+  dg.innerHTML = v.map(([n, l]) => `<div class="digit"><b>${pad(n)}</b><span>${l}</span></div>`).join("");
+}
+setInterval(updateCount, 1000);
+
+function toast(msg) {
+  const el = document.getElementById("toast");
+  el.textContent = msg; el.classList.add("show");
+  clearTimeout(toast._t); toast._t = setTimeout(() => el.classList.remove("show"), 2600);
+}
+function fmtLeft(ms) {
+  const s = Math.max(0, Math.floor(ms / 1000));
+  return pad(Math.floor(s / 3600)) + ":" + pad(Math.floor(s % 3600 / 60)) + ":" + pad(s % 60);
+}
+
+let opening = false;
+function onTap(d, ev, btn) {
+  if (!isOpen(d)) {
+    const left = d.unlockAt - now();
+    // la pallina chiusa trema un attimo
+    btn.animate([{ transform: "rotate(0)" }, { transform: "rotate(-9deg)" }, { transform: "rotate(8deg)" }, { transform: "rotate(-5deg)" }, { transform: "rotate(3deg)" }, { transform: "rotate(0)" }], { duration: 550, easing: "ease-out" });
+    toast(left < 86400000 ? `Si apre oggi alle 15:00, mancano ${fmtLeft(left)}` : `Si apre ${il(d.day)} dicembre alle 15:00`);
+    return;
+  }
+  if (opening) return;
+  opening = true;
+  openFx(d, btn).then(() => { opening = false; openModal(d); });
+}
+
+// effetto apertura: la pallina vola al centro, trema, si illumina ed esplode in brillantini
+function openFx(d, btn) {
+  return new Promise(done => {
+    const r = btn.getBoundingClientRect();
+    const fx = document.createElement("div");
+    fx.className = "fx";
+    fx.innerHTML = `<div class="fx-bg"></div><div class="fx-orn" style="left:${r.left}px;top:${r.top}px;width:${r.width}px">${GUAOrnament(d.day, { suffix: "fx" })}</div><div class="fx-flash"></div>`;
+    document.body.appendChild(fx);
+    const orn = fx.querySelector(".fx-orn"), bg = fx.querySelector(".fx-bg"), flash = fx.querySelector(".fx-flash");
+    const cx = innerWidth / 2, cy = innerHeight / 2;
+    const dx = cx - (r.left + r.width / 2), dy = cy - (r.top + r.height / 2);
+    const big = Math.min(2.6, (Math.min(innerWidth, innerHeight) * .5) / r.width);
+    btn.style.visibility = "hidden";
+    bg.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 400, fill: "forwards" });
+    const fly = orn.animate([
+      { transform: "translate(0,0) scale(1) rotate(0)" },
+      { transform: `translate(${dx}px,${dy}px) scale(${big}) rotate(0)`, offset: .45 },
+      { transform: `translate(${dx}px,${dy}px) scale(${big}) rotate(-8deg)`, offset: .55 },
+      { transform: `translate(${dx}px,${dy}px) scale(${big}) rotate(7deg)`, offset: .65 },
+      { transform: `translate(${dx}px,${dy}px) scale(${big}) rotate(-5deg)`, offset: .75 },
+      { transform: `translate(${dx}px,${dy}px) scale(${big * 1.08}) rotate(0)`, offset: .88 },
+      { transform: `translate(${dx}px,${dy}px) scale(${big * 1.2}) rotate(0)` },
+    ], { duration: 1100, easing: "cubic-bezier(.3,.7,.3,1)", fill: "forwards" });
+    orn.animate([{ filter: "drop-shadow(0 0 0 rgba(255,255,255,0))" }, { filter: "drop-shadow(0 0 30px rgba(255,255,255,1))" }], { duration: 1100, fill: "forwards" });
+    fly.onfinish = () => {
+      orn.animate([{ opacity: 1, transform: getComputedStyle(orn).transform }, { opacity: 0, transform: getComputedStyle(orn).transform + " scale(1.6)" }], { duration: 350, fill: "forwards" });
+      flash.animate([{ opacity: 0, transform: "scale(.2)" }, { opacity: 1, transform: "scale(1)", offset: .35 }, { opacity: 0, transform: "scale(1.4)" }], { duration: 700, easing: "ease-out", fill: "forwards" });
+      burst(cx, cy, 60, 260);
+      setTimeout(() => { done(); bg.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300, fill: "forwards" }); }, 380);
+      setTimeout(() => { fx.remove(); btn.style.visibility = ""; }, 800);
+    };
+  });
+}
+
+function burst(x, y, n = 22, far = 100) {
+  const cols = ["#fff", "#FFD1E1", "#F3B9CA", "#C96A85", "#FFF1C9"];
+  for (let i = 0; i < n; i++) {
+    const p = document.createElement("div");
+    p.className = "burst";
+    const s = 4 + Math.random() * (n > 30 ? 11 : 7);
+    p.innerHTML = `<svg width="${s * 2}" height="${s * 2}" viewBox="-10 -10 20 20"><path d="M0-10Q2-2 10 0Q2 2 0 10Q-2 2-10 0Q-2-2 0-10Z" fill="${cols[i % cols.length]}"/></svg>`;
+    p.style.left = x + "px"; p.style.top = y + "px";
+    document.body.appendChild(p);
+    const a = Math.random() * Math.PI * 2, dist = 40 + Math.random() * far;
+    p.animate([
+      { transform: "translate(-50%,-50%) scale(1)", opacity: 1 },
+      { transform: `translate(${Math.cos(a) * dist}px, ${Math.sin(a) * dist}px) scale(.3) rotate(180deg)`, opacity: 0 }
+    ], { duration: 900 + Math.random() * 400, easing: "cubic-bezier(.2,.8,.3,1)" }).onfinish = () => p.remove();
+  }
+}
+
+let urls = [];
+function closeModal() {
+  document.getElementById("modal").classList.remove("show");
+  document.getElementById("sheet").innerHTML = "";
+  urls.forEach(u => URL.revokeObjectURL(u)); urls = [];
+}
+document.getElementById("modal").addEventListener("click", e => { if (e.target.id === "modal") closeModal(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
+
+const ICONS = {
+  audio: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18V6l10-2v12"/><circle cx="6" cy="18" r="3"/><circle cx="16" cy="16" r="3"/></svg>',
+  youtube: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>',
+  pdf: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/></svg>',
+  code: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M20 12l-8 8-9-9V3h8z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg>',
+  link: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>',
+};
+const DEFAULT_LABEL = { audio: "Ascolta", youtube: "Guarda il video", pdf: "Il tuo PDF", link: "Apri il link", code: "Il tuo codice sconto" };
+
+function openModal(d) {
+  const c = d.content;
+  const sheet = document.getElementById("sheet");
+  sheet.innerHTML = `
+    <div class="grab"></div>
+    <button class="close" aria-label="Chiudi"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+    <div class="s-head">
+      <div class="mini">${GUAOrnament(d.day, { suffix: "m" })}</div>
+      <div><div class="date">${d.day} dicembre</div><h2>${c && c.title ? esc(c.title) : 'La tua <span class="it">sorpresa</span>'}</h2></div>
+    </div>
+    ${c && c.message ? `<p class="msg">${esc(c.message)}</p>` : ""}
+    <div class="items" id="items"></div>`;
+  sheet.querySelector(".close").onclick = closeModal;
+  document.getElementById("modal").classList.add("show");
+  const box = document.getElementById("items");
+  if (!c || !c.items || !c.items.length) { box.innerHTML = `<p class="empty">La sorpresa di oggi sta arrivando, riapri tra poco.</p>`; return; }
+  c.items.forEach(it => {
+    const el = document.createElement("div");
+    el.className = "item";
+    el.innerHTML = `<div class="lab"><i>${ICONS[it.type]}</i>${esc(it.label || DEFAULT_LABEL[it.type])}</div><div class="body"></div>`;
+    box.appendChild(el);
+    renderItem(d.day, it, el.querySelector(".body"));
+  });
+}
+
+function renderItem(day, it, body) {
+  if (window.DEMO_RENDER && window.DEMO_RENDER(it, body)) return;
+  if (it.type === "youtube") {
+    body.innerHTML = `<div class="yt"><iframe src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(it.youtubeId)}?playsinline=1&rel=0" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen title="Video"></iframe></div>`;
+  } else if (it.type === "code") {
+    body.innerHTML = `<div class="code"><span>${esc(it.code)}</span><button type="button" class="copy">Copia</button></div>${it.url ? `<div class="btns" style="margin-top:8px"><a class="btn ghost" href="${esc(it.url)}" target="_blank" rel="noopener">Usalo qui</a></div>` : ""}`;
+    const b = body.querySelector(".copy");
+    b.onclick = async () => {
+      try { await navigator.clipboard.writeText(it.code); b.textContent = "Copiato"; }
+      catch (e) { const r = document.createRange(); r.selectNodeContents(body.querySelector(".code span")); getSelection().removeAllRanges(); getSelection().addRange(r); b.textContent = "Selezionato"; }
+      setTimeout(() => (b.textContent = "Copia"), 2000);
+    };
+  } else if (it.type === "link") {
+    body.innerHTML = `<div class="btns"><a class="btn" href="${esc(it.url)}" target="_blank" rel="noopener">Apri</a></div>`;
+  } else {
+    loadFile(day, it, body);
+  }
+}
+
+async function loadFile(day, it, body) {
+  body.innerHTML = `<div class="loading">Sto scartando la sorpresa…<div class="bar"><i></i></div></div>`;
+  const bar = body.querySelector(".bar i");
+  try {
+    const parts = [];
+    for (let i = 0; i < it.file.parts; i++) {
+      const res = await fetch(`/api/file?day=${day}&f=${encodeURIComponent(it.file.uploadId)}&part=${i}`, { headers: PREVIEW ? { "x-admin-key": adminKey } : {} });
+      if (!res.ok) throw new Error();
+      parts.push(await res.blob());
+      bar.style.width = Math.round((i + 1) / it.file.parts * 100) + "%";
+    }
+    const url = URL.createObjectURL(new Blob(parts, { type: it.file.mime })); urls.push(url);
+    if (it.type === "audio") body.innerHTML = `<audio controls playsinline preload="auto" src="${url}"></audio>`;
+    else {
+      const name = esc(it.file.name || "GUA.pdf");
+      body.innerHTML = `<div class="btns"><a class="btn" href="${url}" target="_blank" rel="noopener">Apri il PDF</a><a class="btn ghost" href="${url}" download="${name}">Scarica</a></div>`;
+    }
+  } catch (e) {
+    body.innerHTML = `<p class="empty" style="margin:0">Non riesco a caricare il file, riprova tra poco.</p>`;
+  }
+}
+
+document.addEventListener("visibilitychange", () => { if (!document.hidden) load(); });
+load();
+</script>
+</body>
+</html>
